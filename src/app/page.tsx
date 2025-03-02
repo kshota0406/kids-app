@@ -1,101 +1,252 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState } from 'react';
+import { AppProvider } from '@/context/AppContext';
+import ChoreCard from '@/components/ChoreCard';
+import PointsDisplay from '@/components/PointsDisplay';
+import HistoryList from '@/components/HistoryList';
+import ChildSelector from '@/components/ChildSelector';
+import { useApp } from '@/context/AppContext';
+import Link from 'next/link';
+
+// お手伝いリストを表示するコンポーネント
+const ChoresList = () => {
+  const { chores } = useApp();
+
+  return (
+    <div className="card mt-6 shadow-md hover:shadow-lg transition-shadow">
+      <h2 className="text-xl font-bold mb-4 flex items-center">
+        <span className="text-2xl mr-2" style={{ color: "#ff922b" }}>⭐</span>
+        おてつだいメニュー
+      </h2>
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+        {chores.map((chore) => (
+          <ChoreCard key={chore.id} chore={chore} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// アプリのメインコンテンツ
+const AppContent = () => {
+  const { children, settlePoints } = useApp();
+  const [showSettleModal, setShowSettleModal] = useState(false);
+  const [settledResults, setSettledResults] = useState<{[key: string]: number}>({});
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+
+  // 全ての子どもの集計処理
+  const handleSettleAll = () => {
+    const results: {[key: string]: number} = {};
+    
+    // 全ての子どもの未集計ポイントを集計
+    children.forEach(child => {
+      results[child.id] = settlePoints(child.id);
+    });
+    
+    setSettledResults(results);
+    setShowSettleModal(true);
+  };
+
+  // パスワード確認処理
+  const handlePasswordCheck = () => {
+    if (password === '1234') {
+      setShowPasswordModal(false);
+      handleSettleAll();
+      setPassword('');
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+    }
+  };
+
+  // 集計ボタンクリック時の処理
+  const handleSettleClick = () => {
+    setShowPasswordModal(true);
+  };
+
+  return (
+    <div className="max-w-5xl mx-auto px-2 py-6">
+      <header className="flex items-center justify-between mb-6 bg-white p-4 rounded-lg shadow-sm">
+        <div className="flex items-center">
+          <span className="text-3xl mr-2" style={{ color: "#ff922b" }}>🏆</span>
+          <h1 className="text-2xl sm:text-3xl font-bold text-blue-600">おてつだいポイント</h1>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={handleSettleClick}
+            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all"
+          >
+            <span className="text-xl">📅</span>
+            <span className="hidden sm:inline">しゅうけい</span>
+          </button>
+          <Link 
+            href="/settings" 
+            className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all"
+          >
+            <span className="text-xl">⚙️</span>
+            <span className="hidden sm:inline">せってい</span>
+          </Link>
+        </div>
+      </header>
+
+      {/* パスワード入力モーダル */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+            <h2 className="text-xl font-bold mb-4 flex items-center">
+              <span className="text-2xl mr-2">🔒</span>
+              パスワードにゅうりょく
+            </h2>
+            
+            <div className="mb-4">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handlePasswordCheck()}
+                className={`w-full p-3 border rounded-lg text-center text-2xl ${passwordError ? 'border-red-500' : 'border-gray-300'}`}
+                placeholder="＊＊＊＊"
+                autoFocus
+              />
+              {passwordError && (
+                <p className="text-red-500 text-center mt-2">パスワードがちがいます</p>
+              )}
+            </div>
+            
+            <div className="flex justify-between gap-3">
+              <button
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setPassword('');
+                  setPasswordError(false);
+                }}
+                className="flex-1 bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handlePasswordCheck}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+              >
+                かくにん
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 集計モーダル */}
+      {showSettleModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+            <h2 className="text-xl font-bold mb-4 flex items-center">
+              <span className="text-2xl mr-2">💰</span>
+              おこづかいけいさん
+            </h2>
+            
+            {Object.keys(settledResults).length > 0 ? (
+              <div>
+                {children.map(child => {
+                  // 子どもアイコンの絵文字マッピング
+                  const childEmojiMap: {[key: string]: string} = {
+                    'user': '👤',
+                    'smile': '😊',
+                    'heart': '❤️',
+                    'star': '⭐',
+                    'sun': '☀️',
+                    'moon': '🌙',
+                    'cloud': '☁️',
+                    'flower': '🌸',
+                    'tree': '🌳',
+                    'cat': '🐱',
+                    'dog': '🐶',
+                    'rabbit': '🐰',
+                    'bear': '🐻',
+                    'panda': '🐼',
+                    'monkey': '🐵',
+                    'penguin': '🐧',
+                    'bird': '🐦',
+                    'fish': '🐠',
+                    'turtle': '🐢',
+                    'butterfly': '🦋',
+                    'bee': '🐝',
+                    'ladybug': '🐞',
+                    'rocket': '🚀',
+                    'award': '🏆',
+                    'gift': '🎁',
+                  };
+                  
+                  // アイコン名に対応する絵文字を取得、なければデフォルト絵文字を使用
+                  const emoji = childEmojiMap[child.avatar] || '👤';
+                  
+                  return (
+                    <div key={child.id} className="mb-4 p-4 rounded-lg" style={{ backgroundColor: `${child.color}10` }}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-2xl" style={{ color: child.color }}>{emoji}</span>
+                        <h3 className="font-bold">{child.name}</h3>
+                      </div>
+                      
+                      {settledResults[child.id] > 0 ? (
+                        <div>
+                          <div className="flex items-center justify-center gap-2 text-2xl font-bold">
+                            <span className="text-2xl">⭐</span>
+                            <span>{settledResults[child.id]}</span>
+                            <span className="text-base">ポイント</span>
+                          </div>
+                          <div className="flex items-center justify-center gap-2 text-2xl font-bold mt-2">
+                            <span className="text-2xl">💴</span>
+                            <span>{settledResults[child.id]}</span>
+                            <span className="text-base">えん</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-center text-gray-500">しゅうけいするおてつだいがありません</p>
+                      )}
+                    </div>
+                  );
+                })}
+                <p className="mt-4 text-sm text-gray-600 text-center">おてつだいをしゅうけいしました！</p>
+              </div>
+            ) : (
+              <p className="text-center py-4">しゅうけいするおてつだいがありません</p>
+            )}
+            
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={() => setShowSettleModal(false)}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg shadow-sm hover:shadow-md transition-all"
+              >
+                とじる
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 子ども選択とポイント表示を横に並べる */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <div className="mb-6">
+            <ChildSelector />
+            <PointsDisplay />
+          </div>
+          <ChoresList />
+        </div>
+        <div>
+          <HistoryList />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    <AppProvider>
+      <AppContent />
+    </AppProvider>
   );
 }
