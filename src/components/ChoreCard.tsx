@@ -52,18 +52,18 @@ const ChoreCard: React.FC<ChoreCardProps> = ({ chore }) => {
 
   return (
     <div 
-      className={`flex flex-col items-center p-3 cursor-pointer transition-all shadow-sm hover:shadow-md rounded-lg ${
+      className={`flex flex-col items-center p-2 cursor-pointer transition-all shadow-sm hover:shadow-md rounded-lg ${
         isAnimating ? 'animate-bounce' : ''
       }`} 
       onClick={handleComplete}
       style={{ 
         borderTop: `3px solid ${selectedChild.color}`,
         backgroundColor: 'white',
-        maxWidth: '120px',
+        width: '100%',
       }}
     >
       <div 
-        className="mb-2 text-2xl"
+        className="mb-1 text-2xl"
       >
         {emoji}
       </div>

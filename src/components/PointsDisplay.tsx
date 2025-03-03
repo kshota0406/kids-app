@@ -54,53 +54,53 @@ const PointsDisplay: React.FC = () => {
 
   return (
     <div 
-      className="p-4 rounded-lg shadow-md relative overflow-hidden transition-all hover:shadow-lg"
+      className="p-3 rounded-lg shadow-md relative overflow-hidden transition-all hover:shadow-lg"
       style={{ 
         backgroundColor: `${selectedChild.color}10`,
-        borderLeft: `6px solid ${selectedChild.color}`
+        borderLeft: `4px solid ${selectedChild.color}`
       }}
     >
-      <div className="mb-3">
-        <h2 className="text-xl font-bold flex items-center">
-          <span className="text-2xl mr-2">{emoji}</span>
+      <div className="mb-2">
+        <h2 className="text-lg font-bold flex items-center">
+          <span className="text-xl mr-2">{emoji}</span>
           {selectedChild.name}のポイント
         </h2>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         {/* 未集計ポイント */}
-        <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm border-l-4 border-blue-400">
-          <span className="text-2xl">🔵</span>
+        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border-l-4 border-blue-400">
+          <span className="text-xl">🔵</span>
           <div>
-            <div className="text-sm text-blue-600 font-medium">みしゅうけい</div>
+            <div className="text-xs text-blue-600 font-medium">みしゅうけい</div>
             <div>
-              <span className="text-2xl font-bold">{unsettledPoints}</span>
-              <span className="text-sm ml-1">ポイント</span>
+              <span className="text-xl font-bold">{unsettledPoints}</span>
+              <span className="text-xs ml-1">ポイント</span>
             </div>
           </div>
         </div>
         
         {/* 集計済みポイント */}
-        <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm border-l-4 border-green-400">
-          <span className="text-2xl">🟢</span>
+        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm border-l-4 border-green-400">
+          <span className="text-xl">🟢</span>
           <div>
-            <div className="text-sm text-green-600 font-medium">しゅうけいずみ</div>
+            <div className="text-xs text-green-600 font-medium">しゅうけいずみ</div>
             <div>
-              <span className="text-2xl font-bold">{settledPoints}</span>
-              <span className="text-sm ml-1">ポイント</span>
+              <span className="text-xl font-bold">{settledPoints}</span>
+              <span className="text-xs ml-1">ポイント</span>
             </div>
           </div>
         </div>
       </div>
       
       {/* 合計ポイント */}
-      <div className="flex items-center gap-3 bg-white p-3 rounded-lg shadow-sm mt-3">
-        <span className="text-3xl">⭐</span>
+      <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm mt-2">
+        <span className="text-2xl">⭐</span>
         <div>
-          <div className="text-sm text-gray-600 font-medium">ごうけい</div>
+          <div className="text-xs text-gray-600 font-medium">ごうけい</div>
           <div>
-            <span className="text-3xl font-bold">{selectedChild.totalPoints}</span>
-            <span className="text-lg ml-2">ポイント</span>
+            <span className="text-2xl font-bold">{selectedChild.totalPoints}</span>
+            <span className="text-base ml-2">ポイント</span>
           </div>
         </div>
       </div>

@@ -48,7 +48,7 @@ const HistoryList: React.FC = () => {
     }
 
     return (
-      <div className="space-y-2 max-h-120 overflow-y-auto pr-1 custom-scrollbar">
+      <div className="space-y-2 max-h-110 overflow-y-auto pr-1 custom-scrollbar">
         {completedChores.map((completedChore) => {
           const chore = chores.find((c) => c.id === completedChore.choreId);
           if (!chore) return null;
@@ -102,7 +102,7 @@ const HistoryList: React.FC = () => {
   };
 
   return (
-    <div className="mt-6 card shadow-md hover:shadow-lg transition-shadow p-3">
+    <div className="mt-6 card shadow-md hover:shadow-lg transition-shadow h-140">
       <div className="flex justify-between items-center mb-3">
         <h2 className="text-xl font-bold flex items-center">
           <Icon name="box" size={22} color="#4dabf7" className="mr-2" />

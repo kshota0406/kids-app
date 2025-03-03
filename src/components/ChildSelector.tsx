@@ -66,21 +66,21 @@ const ChildSelector: React.FC = () => {
               <div
                 key={child.id}
                 onClick={() => setSelectedChildId(child.id)}
-                className={`flex items-center px-3 py-1.5 rounded-lg cursor-pointer transition-all ${
+                className={`flex items-center px-4 py-2.5 rounded-lg cursor-pointer transition-all ${
                   selectedChildId === child.id
                     ? 'bg-white shadow-md'
                     : 'bg-gray-50 hover:bg-gray-100'
                 }`}
                 style={{
-                  borderLeft: selectedChildId === child.id ? `3px solid ${child.color}` : 'none',
+                  borderLeft: selectedChildId === child.id ? `4px solid ${child.color}` : 'none',
                 }}
               >
                 <div className="flex items-center">
-                  <span className="text-xl mr-2">{emoji}</span>
-                  <span className="font-bold">{child.name}</span>
-                  <div className="flex items-center ml-2 bg-yellow-50 px-2 py-0.5 rounded-full">
-                    <span className="text-xs">⭐</span>
-                    <span className="ml-1 text-xs font-bold">{child.totalPoints}</span>
+                  <span className="text-2xl mr-2">{emoji}</span>
+                  <span className="font-bold text-lg">{child.name}</span>
+                  <div className="flex items-center ml-2 bg-yellow-50 px-2 py-1 rounded-full">
+                    <span className="text-sm">⭐</span>
+                    <span className="ml-1 text-sm font-bold">{child.totalPoints}</span>
                   </div>
                 </div>
               </div>

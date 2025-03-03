@@ -64,12 +64,20 @@ const SettingsContent = () => {
     updateChildAvatar,
     updateChildColor,
     addChild,
+    deleteChild,
     chores, 
-    addChore, 
+    addChore,
+    deleteChore,
     resetAllPoints,
     exportData,
     importData
   } = useApp();
+
+  // パスワード関連の状態
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // 選択された子ども
   const selectedChild = children.find(child => child.id === selectedChildId);
@@ -111,37 +119,83 @@ const SettingsContent = () => {
     }
   };
 
-  // 新しい子どもを追加
-  const handleAddChild = () => {
-    if (newChildName.trim()) {
-      addChild(newChildName);
-      setNewChildName('');
-      alert('あたらしいこどもをついかしました！');
+  // パスワード確認処理
+  const handlePasswordCheck = () => {
+    if (password === '1234') {
+      setShowPasswordModal(false);
+      setIsAuthenticated(true);
+      setPassword('');
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
     }
   };
 
+  // 認証が必要な操作を実行する前にパスワード確認
+  const handleProtectedAction = (action: () => void) => {
+    if (isAuthenticated) {
+      action();
+    } else {
+      setShowPasswordModal(true);
+    }
+  };
 
-  // 新しいお手伝いを追加
+  // 子どもの追加処理
+  const handleAddChild = () => {
+    handleProtectedAction(() => {
+      if (newChildName.trim()) {
+        addChild(newChildName);
+        setNewChildName('');
+        alert('あたらしいこどもをついかしました！');
+      }
+    });
+  };
+
+  // 子どもの削除処理
+  const handleDeleteChild = (childId: string) => {
+    handleProtectedAction(() => {
+      if (window.confirm('このこどもをけしますか？')) {
+        deleteChild(childId);
+        alert('こどもをけしました！');
+      }
+    });
+  };
+
+  // お手伝いの追加処理
   const handleAddChore = (e: React.FormEvent) => {
     e.preventDefault();
-    if (newChoreName.trim()) {
-      addChore({
-        name: newChoreName,
-        points: newChorePoints,
-        iconName: newChoreIcon,
-      });
-      setNewChoreName('');
-      setNewChorePoints(5);
-      alert('あたらしいおてつだいをついかしました！');
-    }
+    handleProtectedAction(() => {
+      if (newChoreName.trim()) {
+        addChore({
+          name: newChoreName,
+          points: newChorePoints,
+          iconName: newChoreIcon,
+        });
+        setNewChoreName('');
+        setNewChorePoints(5);
+        alert('あたらしいおてつだいをついかしました！');
+      }
+    });
+  };
+
+  // お手伝いの削除処理
+  const handleDeleteChore = (choreId: string) => {
+    handleProtectedAction(() => {
+      if (window.confirm('このおてつだいをけしますか？')) {
+        deleteChore(choreId);
+        alert('おてつだいをけしました！');
+      }
+    });
   };
 
   // 全てのポイントをリセット
   const handleResetAllPoints = () => {
-    if (window.confirm('すべてのこどものポイントをリセットしますか？')) {
-      resetAllPoints();
-      alert('すべてのポイントをリセットしました！');
-    }
+    handleProtectedAction(() => {
+      if (window.confirm('すべてのこどものポイントをリセットしますか？')) {
+        resetAllPoints();
+        alert('すべてのポイントをリセットしました！');
+      }
+    });
   };
 
   // ファイルからデータをインポート
@@ -240,6 +294,12 @@ const SettingsContent = () => {
                         className="text-blue-500 hover:text-blue-700"
                       >
                         へんしゅう
+                      </button>
+                      <button
+                        onClick={() => handleDeleteChild(child.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        けす
                       </button>
                     </div>
                   </div>
@@ -415,6 +475,12 @@ const SettingsContent = () => {
                           </div>
                         </div>
                       </div>
+                      <button
+                        onClick={() => handleDeleteChore(chore.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        けす
+                      </button>
                     </div>
                   );
                 })}
@@ -489,6 +555,52 @@ const SettingsContent = () => {
           </button>
         </div>
       </div>
+
+      {/* パスワード入力モーダル */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
+            <h2 className="text-xl font-bold mb-4 flex items-center">
+              <span className="text-2xl mr-2">🔒</span>
+              パスワードにゅうりょく
+            </h2>
+            
+            <div className="mb-4">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handlePasswordCheck()}
+                className={`w-full p-3 border rounded-lg text-center text-2xl ${passwordError ? 'border-red-500' : 'border-gray-300'}`}
+                placeholder="＊＊＊＊"
+                autoFocus
+              />
+              {passwordError && (
+                <p className="text-red-500 text-center mt-2">パスワードがちがいます</p>
+              )}
+            </div>
+            
+            <div className="flex justify-between gap-3">
+              <button
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setPassword('');
+                  setPasswordError(false);
+                }}
+                className="flex-1 bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handlePasswordCheck}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+              >
+                かくにん
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

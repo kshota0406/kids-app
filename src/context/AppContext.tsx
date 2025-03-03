@@ -4,12 +4,15 @@ import { v4 as uuidv4 } from 'uuid';
 
 // デフォルトのお手伝いリスト
 const defaultChores: ChoreType[] = [
-  { id: '1', name: 'おふとんをたたむ', points: 5, iconName: 'bed' },
-  { id: '2', name: 'しょっきをあらう', points: 10, iconName: 'dish' },
-  { id: '3', name: 'そうじをする', points: 8, iconName: 'broom' },
-  { id: '4', name: 'ごみをだす', points: 5, iconName: 'trash' },
-  { id: '5', name: 'せんたくものをたたむ', points: 7, iconName: 'shirt' },
-  { id: '6', name: 'おかたづけをする', points: 6, iconName: 'box' },
+  { id: '1', name: 'あらいもの', points: 50, iconName: 'dish' },
+  { id: '2', name: 'そうじ', points: 60, iconName: 'broom' },
+  { id: '3', name: 'ごみだし', points: 50, iconName: 'trash' },
+  { id: '4', name: 'せんたく', points: 70, iconName: 'shirt' },
+  { id: '5', name: 'おかたづけ', points: 60, iconName: 'box' },
+  { id: '6', name: 'りょうり', points: 60, iconName: 'dish' },
+  { id: '7', name: 'きんぎょ', points: 20, iconName: 'star' },
+  { id: '8', name: 'ぜんぶたべる', points: 80, iconName: 'star' },
+  { id: '9', name: 'やさしくする', points: 100, iconName: 'star' },
 ];
 
 // デフォルトの子どもたち
@@ -348,7 +351,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const unsettledChores = getUnsettledChores(childId);
     if (unsettledChores.length === 0) return 0;
 
-    // 未集計のポイント合計を計算
+    // 未集計のポイント合計を計算（1倍）
     const totalUnsettledPoints = unsettledChores.reduce((sum, chore) => sum + chore.points, 0);
 
     // 未集計のお手伝いを集計済みに更新
