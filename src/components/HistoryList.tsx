@@ -60,18 +60,41 @@ const HistoryList: React.FC = () => {
 
   // 履歴を日付でグループ化する
   const groupedHistory = history.reduce<{ [date: string]: CompletedChore[] }>((acc, item) => {
-    // 日付だけの文字列に変換（時間は含めない）
-    const dateStr = new Date(item.timestamp).toISOString().split('T')[0];
-    if (!acc[dateStr]) {
-      acc[dateStr] = [];
+    try {
+      // 日付だけの文字列に変換（時間は含めない）
+      // timestamp が無効な値でないかチェック
+      if (!item.timestamp) {
+        console.error('Invalid timestamp found:', item);
+        return acc;
+      }
+      
+      const date = new Date(item.timestamp);
+      
+      // 無効な日付値をチェック
+      if (isNaN(date.getTime())) {
+        console.error('Invalid date found:', item.timestamp);
+        return acc;
+      }
+      
+      const dateStr = date.toISOString().split('T')[0];
+      if (!acc[dateStr]) {
+        acc[dateStr] = [];
+      }
+      acc[dateStr].push(item);
+    } catch (error) {
+      console.error('Error processing history item:', item, error);
     }
-    acc[dateStr].push(item);
     return acc;
   }, {});
 
   // 日付の降順でソートされた日付一覧
   const sortedDates = Object.keys(groupedHistory).sort((a, b) => {
-    return new Date(b).getTime() - new Date(a).getTime();
+    try {
+      return new Date(b).getTime() - new Date(a).getTime();
+    } catch (error) {
+      console.error('Error sorting dates:', a, b, error);
+      return 0;
+    }
   });
 
   // 子供の情報を取得する関数
@@ -103,19 +126,43 @@ const HistoryList: React.FC = () => {
 
   // 日付を整形する関数
   const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const weekday = ['日', '月', '火', '水', '木', '金', '土'][date.getDay()];
-    return `${month}月${day}日 (${weekday})`;
+    try {
+      const date = new Date(dateStr);
+      
+      // 無効な日付値をチェック
+      if (isNaN(date.getTime())) {
+        console.error('Invalid date in formatDate:', dateStr);
+        return '不明な日付';
+      }
+      
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const weekday = ['日', '月', '火', '水', '木', '金', '土'][date.getDay()];
+      return `${month}月${day}日 (${weekday})`;
+    } catch (error) {
+      console.error('Error formatting date:', dateStr, error);
+      return '不明な日付';
+    }
   };
 
   // 時間を整形する関数
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+    try {
+      const date = new Date(timestamp);
+      
+      // 無効な日付値をチェック
+      if (isNaN(date.getTime())) {
+        console.error('Invalid date in formatTime:', timestamp);
+        return '--:--';
+      }
+      
+      const hours = date.getHours();
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    } catch (error) {
+      console.error('Error formatting time:', timestamp, error);
+      return '--:--';
+    }
   };
 
   return (

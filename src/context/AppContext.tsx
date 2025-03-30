@@ -183,9 +183,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // 全ての子どもの履歴を取得（最新順）
   const getSharedHistory = () => {
-    return [...completedChores].sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
+    try {
+      return [...completedChores].sort((a, b) => {
+        try {
+          const dateA = new Date(a.timestamp);
+          const dateB = new Date(b.timestamp);
+          
+          // 無効な日付値をチェック
+          if (isNaN(dateA.getTime())) {
+            console.error('Invalid date in sorting (A):', a.timestamp);
+            return 1; // 不正な日付は後ろに表示
+          }
+          
+          if (isNaN(dateB.getTime())) {
+            console.error('Invalid date in sorting (B):', b.timestamp);
+            return -1; // 不正な日付は後ろに表示
+          }
+          
+          return dateB.getTime() - dateA.getTime();
+        } catch (error) {
+          console.error('Error comparing dates:', a.timestamp, b.timestamp, error);
+          return 0;
+        }
+      });
+    } catch (error) {
+      console.error('Error sorting shared history:', error);
+      return [];
+    }
   };
 
   // ========== ポイント清算関連の関数 ==========
