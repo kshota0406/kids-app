@@ -1,57 +1,206 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { AppProvider, useApp } from '@/context/AppContext';
 import Link from 'next/link';
 import { Child } from '@/types';
+import { 
+  childEmojiMap, 
+  choreEmojiMap, 
+  iconOptions, 
+  avatarOptions, 
+  colorOptions 
+} from '@/utils/emojiMaps';
+import EmojiSelector from '@/components/EmojiSelector';
+import ColorSelector from '@/components/ColorSelector';
 
-// 絵文字マッピング
-const childEmojiMap: {[key: string]: string} = {
-  'user': '👤',
-  'smile': '😊',
-  'heart': '❤️',
-  'star': '⭐',
-  'sun': '☀️',
-  'moon': '🌙',
-  'cloud': '☁️',
-  'flower': '🌸',
-  'tree': '🌳',
-  'cat': '🐱',
-  'dog': '🐶',
-  'rabbit': '🐰',
-  'bear': '🐻',
-  'panda': '🐼',
-  'monkey': '🐵',
-  'penguin': '🐧',
-  'bird': '🐦',
-  'fish': '🐠',
-  'turtle': '🐢',
-  'butterfly': '🦋',
-  'bee': '🐝',
-  'ladybug': '🐞',
-  'rocket': '🚀',
-  'award': '🏆',
-  'gift': '🎁',
+// 子ども編集フォーム
+const ChildEditForm = ({ 
+  name, 
+  setName, 
+  avatar, 
+  setAvatar, 
+  color, 
+  setColor, 
+  onSave, 
+  onCancel 
+}: {
+  name: string;
+  setName: (name: string) => void;
+  avatar: string;
+  setAvatar: (avatar: string) => void;
+  color: string;
+  setColor: (color: string) => void;
+  onSave: () => void;
+  onCancel: () => void;
+}) => {
+  return (
+    <div className="space-y-5">
+      <div>
+        <label className="block mb-2 font-bold">なまえ</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          placeholder="こどものなまえ"
+        />
+      </div>
+      
+      <div>
+        <label className="block mb-2 font-bold">アイコン</label>
+        <EmojiSelector 
+          options={avatarOptions}
+          selectedValue={avatar}
+          onChange={setAvatar}
+        />
+      </div>
+      
+      <div>
+        <label className="block mb-2 font-bold">カラー</label>
+        <ColorSelector 
+          options={colorOptions}
+          selectedValue={color}
+          onChange={setColor}
+        />
+      </div>
+      
+      <div className="flex justify-end gap-3 mt-6">
+        <button
+          onClick={onCancel}
+          className="bg-gray-200 hover:bg-gray-300 px-5 py-2.5 rounded-lg transition-colors font-medium"
+        >
+          キャンセル
+        </button>
+        <button
+          onClick={onSave}
+          className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg transition-colors font-medium"
+        >
+          ほぞん
+        </button>
+      </div>
+    </div>
+  );
 };
 
-// お手伝い絵文字マッピング
-const choreEmojiMap: {[key: string]: string} = {
-  'trash': '🗑️',
-  'book': '📚',
-  'broom': '🧹',
-  'dish': '🍽️',
-  'laundry': '👕',
-  'plant': '🌱',
-  'bed': '🛏️',
-  'pet': '🐶',
-  'toy': '🧸',
-  'clean': '🧼',
-  'mail': '📬',
-  'shop': '🛒',
-  'star': '⭐',
-  'check': '✅',
-  'shirt': '👕',
-  'box': '📦',
+// 新しいお手伝い追加フォーム
+const ChoreAddForm = ({
+  name,
+  setName,
+  points,
+  setPoints,
+  icon,
+  setIcon,
+  onSubmit
+}: {
+  name: string;
+  setName: (name: string) => void;
+  points: number;
+  setPoints: (points: number) => void;
+  icon: string;
+  setIcon: (icon: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
+}) => {
+  return (
+    <form onSubmit={onSubmit} className="space-y-5">
+      <div>
+        <label className="block mb-2 font-bold">なまえ</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+          placeholder="おてつだいのなまえ"
+          required
+        />
+      </div>
+      <div>
+        <label className="block mb-2 font-bold">ポイント</label>
+        <div className="flex items-center">
+          <input
+            type="number"
+            min="1"
+            max="20"
+            value={points}
+            onChange={(e) => setPoints(Number(e.target.value))}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            required
+          />
+          <span className="ml-2 text-xl">⭐</span>
+        </div>
+      </div>
+      <div>
+        <label className="block mb-2 font-bold">アイコン</label>
+        <EmojiSelector 
+          options={iconOptions}
+          selectedValue={icon}
+          onChange={setIcon}
+        />
+      </div>
+      <button
+        type="submit"
+        className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium shadow-sm hover:shadow transition-all mt-4"
+      >
+        ついか
+      </button>
+    </form>
+  );
+};
+
+// パスワードモーダル
+const PasswordModal = ({
+  password,
+  setPassword,
+  passwordError,
+  onCheck,
+  onCancel
+}: {
+  password: string;
+  setPassword: (password: string) => void;
+  passwordError: boolean;
+  onCheck: () => void;
+  onCancel: () => void;
+}) => {
+  return (
+    <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-xl">
+        <h2 className="text-xl font-bold mb-5 flex items-center">
+          <span className="text-2xl mr-2">🔒</span>
+          パスワードにゅうりょく
+        </h2>
+        
+        <div className="mb-5">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && onCheck()}
+            className={`w-full p-4 border rounded-lg text-center text-2xl ${passwordError ? 'border-red-500 bg-red-50' : 'border-gray-300'}`}
+            placeholder="＊＊＊＊"
+            autoFocus
+          />
+          {passwordError && (
+            <p className="text-red-500 text-center mt-2 font-medium">パスワードがちがいます</p>
+          )}
+        </div>
+        
+        <div className="flex justify-between gap-4">
+          <button
+            onClick={onCancel}
+            className="flex-1 bg-gray-200 hover:bg-gray-300 px-4 py-3 rounded-lg font-medium transition-colors"
+          >
+            キャンセル
+          </button>
+          <button
+            onClick={onCheck}
+            className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors"
+          >
+            かくにん
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 // 設定ページのコンテンツ
@@ -60,17 +209,13 @@ const SettingsContent = () => {
     children, 
     selectedChildId, 
     setSelectedChildId,
-    updateChildName, 
-    updateChildAvatar,
-    updateChildColor,
-    addChild,
-    deleteChild,
+    updateChild,
     chores, 
     addChore,
     deleteChore,
-    resetAllPoints,
+    getChildById,
     exportData,
-    importData
+    importData,
   } = useApp();
 
   // パスワード関連の状態
@@ -87,17 +232,15 @@ const SettingsContent = () => {
   const [newChorePoints, setNewChorePoints] = useState(5);
   const [newChoreIcon, setNewChoreIcon] = useState('star');
   
-  // 新しい子ども用の状態
-  const [newChildName, setNewChildName] = useState('');
-  
   // 子どもの編集用の状態
   const [editingChildName, setEditingChildName] = useState('');
   const [editingChildAvatar, setEditingChildAvatar] = useState('');
   const [editingChildColor, setEditingChildColor] = useState('');
   const [isEditingChild, setIsEditingChild] = useState(false);
 
-  // ファイル入力の参照
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  // バックアップ・復元関係の状態
+  const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // 子どもの編集を開始
   const startEditingChild = (child: Child) => {
@@ -110,10 +253,12 @@ const SettingsContent = () => {
 
   // 子どもの編集を保存
   const saveChildEdit = () => {
-    if (editingChildName.trim()) {
-      updateChildName(selectedChildId, editingChildName);
-      updateChildAvatar(selectedChildId, editingChildAvatar);
-      updateChildColor(selectedChildId, editingChildColor);
+    if (editingChildName.trim() && selectedChildId) {
+      updateChild(selectedChildId, {
+        name: editingChildName,
+        avatar: editingChildAvatar,
+        color: editingChildColor
+      });
       setIsEditingChild(false);
       alert('こどもの情報をほぞんしました！');
     }
@@ -138,27 +283,6 @@ const SettingsContent = () => {
     } else {
       setShowPasswordModal(true);
     }
-  };
-
-  // 子どもの追加処理
-  const handleAddChild = () => {
-    handleProtectedAction(() => {
-      if (newChildName.trim()) {
-        addChild(newChildName);
-        setNewChildName('');
-        alert('あたらしいこどもをついかしました！');
-      }
-    });
-  };
-
-  // 子どもの削除処理
-  const handleDeleteChild = (childId: string) => {
-    handleProtectedAction(() => {
-      if (window.confirm('このこどもをけしますか？')) {
-        deleteChild(childId);
-        alert('こどもをけしました！');
-      }
-    });
   };
 
   // お手伝いの追加処理
@@ -188,418 +312,264 @@ const SettingsContent = () => {
     });
   };
 
-  // 全てのポイントをリセット
-  const handleResetAllPoints = () => {
+  // データをエクスポートする処理
+  const handleExportData = () => {
     handleProtectedAction(() => {
-      if (window.confirm('すべてのこどものポイントをリセットしますか？')) {
-        resetAllPoints();
-        alert('すべてのポイントをリセットしました！');
+      try {
+        const jsonData = exportData();
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonData);
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        downloadAnchorNode.setAttribute("download", `kids-app-backup-${date}.json`);
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+        alert('データのバックアップが完了しました！');
+      } catch (error) {
+        console.error('バックアップエラー:', error);
+        alert('バックアップに失敗しました。もう一度お試しください。');
       }
     });
   };
 
-  // ファイルからデータをインポート
-  const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  // ファイル選択時の処理
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const content = event.target?.result as string;
-      if (content) {
-        const success = importData(content);
+    reader.onload = (e) => {
+      try {
+        const jsonData = e.target?.result as string;
+        const success = importData(jsonData);
+        
         if (success) {
-          alert('データをインポートしました！');
+          setImportStatus('success');
+          alert('データの復元が完了しました！');
+        } else {
+          setImportStatus('error');
+          alert('データの形式が正しくありません。有効なバックアップファイルを選択してください。');
         }
+      } catch (error) {
+        console.error('復元エラー:', error);
+        setImportStatus('error');
+        alert('データの復元に失敗しました。もう一度お試しください。');
+      }
+      
+      // ファイル入力をリセット
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
     };
-    reader.readAsText(file);
     
-    // ファイル選択をリセット
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    reader.readAsText(file);
   };
 
-  const iconOptions = [
-    { value: 'bed', label: 'ベッド', emoji: '🛏️' },
-    { value: 'dish', label: 'おさら', emoji: '🍽️' },
-    { value: 'broom', label: 'ほうき', emoji: '🧹' },
-    { value: 'trash', label: 'ごみ', emoji: '🗑️' },
-    { value: 'shirt', label: 'ふく', emoji: '👕' },
-    { value: 'box', label: 'はこ', emoji: '📦' },
-    { value: 'star', label: 'ほし', emoji: '⭐' },
-  ];
-
-  const avatarOptions = [
-    { value: 'smile', label: 'えがお', emoji: '😊' },
-    { value: 'heart', label: 'ハート', emoji: '❤️' },
-    { value: 'user', label: 'ひと', emoji: '👤' },
-    { value: 'award', label: 'メダル', emoji: '🏆' },
-    { value: 'gift', label: 'プレゼント', emoji: '🎁' },
-  ];
-
-  const colorOptions = [
-    { value: '#4dabf7', label: 'あお' },
-    { value: '#ff922b', label: 'オレンジ' },
-    { value: '#51cf66', label: 'みどり' },
-    { value: '#ffd43b', label: 'きいろ' },
-    { value: '#ff6b6b', label: 'あか' },
-    { value: '#cc5de8', label: 'むらさき' },
-  ];
+  // ファイル選択ダイアログを開く
+  const handleImportClick = () => {
+    handleProtectedAction(() => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    });
+  };
 
   return (
-    <div className="max-w-5xl mx-auto px-2 py-6">
-      <header className="flex items-center justify-between mb-6">
+    <div className="max-w-3xl mx-auto px-4 py-8">
+      <header className="flex items-center justify-between mb-8 bg-gradient-to-r from-blue-500 to-blue-600 p-4 rounded-xl shadow-md">
         <div className="flex items-center">
-          <span className="text-2xl mr-2">⚙️</span>
-          <h1 className="text-2xl font-bold text-blue-600">せっていページ</h1>
+          <span className="text-3xl mr-3">⚙️</span>
+          <h1 className="text-2xl font-bold text-white">せっていページ</h1>
         </div>
         <div className="flex gap-2">
-          <Link href="/" className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-full">
-            もどる
+          <Link href="/" className="flex items-center gap-2 bg-white hover:bg-gray-100 text-blue-600 px-5 py-2 rounded-full shadow-sm transition-all">
+            <span className="text-lg">🏠</span> もどる
           </Link>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
-          {/* 子どもの管理 */}
-          <div className="card p-6">
-            <h2 className="text-xl font-bold mb-4">こどものかんり</h2>
-            
-            {/* 子どもリスト */}
-            <div className="space-y-3 mb-6">
-              {children.map((child) => {
-                const emoji = childEmojiMap[child.avatar] || '👤';
+      <div className="space-y-8">
+        {/* 子どもの管理 */}
+        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+          <h2 className="text-xl font-bold mb-5 flex items-center"><span className="text-xl mr-2">👨‍👩‍👧‍👦</span>こどものかんり</h2>
+          
+          {/* 子どもリスト */}
+          <div className="space-y-4">
+            {children.map((child) => {
+              const emoji = childEmojiMap[child.avatar] || '👤';
+              return (
+                <div 
+                  key={child.id} 
+                  className="flex items-center justify-between p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-all"
+                  style={{ backgroundColor: `${child.color}10` }}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl" style={{ color: child.color }}>{emoji}</span>
+                    <div>
+                      <p className="font-bold text-lg">{child.name}</p>
+                      <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-full inline-flex mt-1">
+                        <span className="text-sm">⭐</span>
+                        <span className="text-sm font-medium">{child.totalPoints}ポイント</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => startEditingChild(child)}
+                      className="bg-blue-50 text-blue-600 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      へんしゅう
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
+            {children.length === 0 && (
+              <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+                <p>こどもがとうろくされていません</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 子ども編集フォーム */}
+        {isEditingChild && selectedChild && (
+          <div className="bg-white p-6 rounded-xl shadow-md border border-blue-100">
+            <h2 className="text-xl font-bold mb-5 flex items-center text-blue-600">
+              <span className="text-xl mr-2">✏️</span>こどもをへんしゅう
+            </h2>
+            <ChildEditForm 
+              name={editingChildName}
+              setName={setEditingChildName}
+              avatar={editingChildAvatar}
+              setAvatar={setEditingChildAvatar}
+              color={editingChildColor}
+              setColor={setEditingChildColor}
+              onSave={saveChildEdit}
+              onCancel={() => setIsEditingChild(false)}
+            />
+          </div>
+        )}
+
+        {/* お手伝い追加フォーム */}
+        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+          <h2 className="text-xl font-bold mb-5 flex items-center"><span className="text-xl mr-2">✨</span>あたらしいおてつだい</h2>
+          <ChoreAddForm 
+            name={newChoreName}
+            setName={setNewChoreName}
+            points={newChorePoints}
+            setPoints={setNewChorePoints}
+            icon={newChoreIcon}
+            setIcon={setNewChoreIcon}
+            onSubmit={handleAddChore}
+          />
+        </div>
+
+        {/* お手伝いリスト */}
+        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+          <h2 className="text-xl font-bold mb-5 flex items-center"><span className="text-xl mr-2">📋</span>とうろくされているおてつだい</h2>
+          {chores.length === 0 ? (
+            <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg">
+              <p>おてつだいがとうろくされていません</p>
+            </div>
+          ) : (
+            <div className="space-y-3 max-h-96 overflow-y-auto pr-2 scrollbar-thin">
+              {chores.map((chore) => {
+                const emoji = choreEmojiMap[chore.iconName] || '✨';
                 return (
-                  <div 
-                    key={child.id} 
-                    className="flex items-center justify-between p-3 rounded-lg"
-                    style={{ backgroundColor: `${child.color}15` }}
-                  >
+                  <div key={chore.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm hover:shadow-md transition-all border border-gray-100">
                     <div className="flex items-center gap-3">
-                      <span className="text-2xl" style={{ color: child.color }}>{emoji}</span>
+                      <span className="text-3xl">{emoji}</span>
                       <div>
-                        <p className="font-bold">{child.name}</p>
-                        <div className="flex items-center gap-1">
+                        <p className="font-bold text-lg">{chore.name}</p>
+                        <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-full inline-flex mt-1">
                           <span className="text-sm">⭐</span>
-                          <span className="text-sm">{child.totalPoints}ポイント</span>
+                          <span className="text-sm font-medium">{chore.points}ポイント</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => startEditingChild(child)}
-                        className="text-blue-500 hover:text-blue-700"
-                      >
-                        へんしゅう
-                      </button>
-                      <button
-                        onClick={() => handleDeleteChild(child.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        けす
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleDeleteChore(chore.id)}
+                      className="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      けす
+                    </button>
                   </div>
                 );
               })}
             </div>
-            
-            {/* 子ども追加フォーム */}
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="text"
-                value={newChildName}
-                onChange={(e) => setNewChildName(e.target.value)}
-                className="flex-1 p-2 border rounded-lg"
-                placeholder="あたらしいこどものなまえ"
-              />
-              <button
-                onClick={handleAddChild}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
-              >
-                ついか
-              </button>
-            </div>
-          </div>
-
-          {/* 子ども編集フォーム */}
-          {isEditingChild && selectedChild && (
-            <div className="card p-6">
-              <h2 className="text-xl font-bold mb-4">こどもをへんしゅう</h2>
-              <div className="space-y-4">
-                <div>
-                  <label className="block mb-1 font-bold">なまえ</label>
-                  <input
-                    type="text"
-                    value={editingChildName}
-                    onChange={(e) => setEditingChildName(e.target.value)}
-                    className="w-full p-2 border rounded-lg"
-                    placeholder="こどものなまえ"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block mb-1 font-bold">アイコン</label>
-                  <div className="grid grid-cols-5 gap-2">
-                    {avatarOptions.map((avatar) => (
-                      <div
-                        key={avatar.value}
-                        onClick={() => setEditingChildAvatar(avatar.value)}
-                        className={`flex flex-col items-center p-2 border rounded-lg cursor-pointer ${
-                          editingChildAvatar === avatar.value ? 'bg-blue-100 border-blue-500' : ''
-                        }`}
-                      >
-                        <span className="text-2xl">{avatar.emoji}</span>
-                        <span className="text-xs mt-1">{avatar.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block mb-1 font-bold">カラー</label>
-                  <div className="grid grid-cols-6 gap-2">
-                    {colorOptions.map((color) => (
-                      <div
-                        key={color.value}
-                        onClick={() => setEditingChildColor(color.value)}
-                        className={`flex flex-col items-center p-2 border rounded-lg cursor-pointer ${
-                          editingChildColor === color.value ? 'border-2' : ''
-                        }`}
-                        style={{ borderColor: editingChildColor === color.value ? color.value : 'transparent' }}
-                      >
-                        <div 
-                          className="w-6 h-6 rounded-full mb-1" 
-                          style={{ backgroundColor: color.value }}
-                        ></div>
-                        <span className="text-xs">{color.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="flex justify-end gap-2 mt-4">
-                  <button
-                    onClick={() => setIsEditingChild(false)}
-                    className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg"
-                  >
-                    キャンセル
-                  </button>
-                  <button
-                    onClick={saveChildEdit}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-                  >
-                    ほぞん
-                  </button>
-                </div>
-              </div>
-            </div>
           )}
         </div>
-        
-        <div className="space-y-6">
-          {/* お手伝い追加フォーム */}
-          <div className="card p-6">
-            <h2 className="text-xl font-bold mb-4">あたらしいおてつだい</h2>
-            <form onSubmit={handleAddChore} className="space-y-4">
-              <div>
-                <label className="block mb-1 font-bold">なまえ</label>
-                <input
-                  type="text"
-                  value={newChoreName}
-                  onChange={(e) => setNewChoreName(e.target.value)}
-                  className="w-full p-2 border rounded-lg"
-                  placeholder="おてつだいのなまえ"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-bold">ポイント</label>
-                <input
-                  type="number"
-                  min="1"
-                  max="20"
-                  value={newChorePoints}
-                  onChange={(e) => setNewChorePoints(Number(e.target.value))}
-                  className="w-full p-2 border rounded-lg"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block mb-1 font-bold">アイコン</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {iconOptions.map((icon) => (
-                    <div
-                      key={icon.value}
-                      onClick={() => setNewChoreIcon(icon.value)}
-                      className={`flex flex-col items-center p-2 border rounded-lg cursor-pointer ${
-                        newChoreIcon === icon.value ? 'bg-blue-100 border-blue-500' : ''
-                      }`}
-                    >
-                      <span className="text-2xl">{icon.emoji}</span>
-                      <span className="text-sm mt-1">{icon.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-              >
-                ついか
-              </button>
-            </form>
-          </div>
 
-          {/* お手伝いリスト */}
-          <div className="card p-6">
-            <h2 className="text-xl font-bold mb-4">とうろくされているおてつだい</h2>
-            {chores.length === 0 ? (
-              <p className="text-center py-4 text-gray-500">おてつだいがとうろくされていません</p>
-            ) : (
-              <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
-                {chores.map((chore) => {
-                  const emoji = choreEmojiMap[chore.iconName] || '✨';
-                  return (
-                    <div key={chore.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">{emoji}</span>
-                        <div>
-                          <p className="font-bold">{chore.name}</p>
-                          <div className="flex items-center gap-1">
-                            <span className="text-sm">⭐</span>
-                            <span className="text-sm">{chore.points}ポイント</span>
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleDeleteChore(chore.id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        けす
-                      </button>
-                    </div>
-                  );
-                })}
+        {/* バックアップ・復元セクション */}
+        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+          <h2 className="text-xl font-bold mb-5 flex items-center">
+            <span className="text-xl mr-2">💾</span>データのバックアップ・ふっげん
+          </h2>
+          <div className="space-y-5">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <p className="text-sm text-blue-800">
+                お子様の情報やお手伝い履歴をバックアップして保存することができます。
+                データを復元する場合は、バックアップファイルを選択してください。
+              </p>
+            </div>
+            
+            <div className="space-y-3">
+              <button
+                onClick={handleExportData}
+                className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg font-medium shadow-sm transition-all"
+              >
+                <span className="text-xl">📥</span>
+                データのバックアップ
+              </button>
+              
+              <button
+                onClick={handleImportClick}
+                className="w-full flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg font-medium shadow-sm transition-all"
+              >
+                <span className="text-xl">📤</span>
+                データの復元
+              </button>
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+            
+            {importStatus === 'success' && (
+              <div className="bg-green-50 p-3 rounded-lg text-center">
+                <p className="text-green-800 font-medium">データの復元が完了しました！ ✅</p>
+              </div>
+            )}
+            
+            {importStatus === 'error' && (
+              <div className="bg-red-50 p-3 rounded-lg text-center">
+                <p className="text-red-800 font-medium">データの復元に失敗しました。もう一度お試しください。</p>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* データバックアップと復元セクション */}
-      <div className="mt-8 card p-6">
-        <h2 className="text-xl font-bold mb-4 flex items-center">
-          <span className="text-2xl mr-2">💾</span>
-          データのバックアップと復元
-        </h2>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <h3 className="font-bold mb-2">データのバックアップ</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              現在のデータをファイルに保存します。
-            </p>
-            <button
-              onClick={exportData}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
-            >
-              <span className="text-xl">💾</span>
-              データを保存する
-            </button>
-          </div>
-          
-          <div>
-            <h3 className="font-bold mb-2">データの復元</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              保存したファイルからデータを読み込みます。
-            </p>
-            <input
-              type="file"
-              accept=".json"
-              ref={fileInputRef}
-              onChange={handleFileImport}
-              className="hidden"
-            />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
-            >
-              <span className="text-xl">📂</span>
-              ファイルから読み込む
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      {/* 危険な操作セクション */}
-      <div className="mt-6 card p-6 border-red-200">
-        <h2 className="text-xl font-bold mb-4 flex items-center text-red-600">
-          <span className="text-2xl mr-2">⚠️</span>
-          きけんな操作
-        </h2>
-        
-        <div>
-          <p className="text-sm text-gray-600 mb-3">
-            すべてのこどものポイントをリセットします。この操作は取り消せません。
-          </p>
-          <button
-            onClick={handleResetAllPoints}
-            className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
-          >
-            <span className="text-xl">🗑️</span>
-            すべてのポイントをリセット
-          </button>
-        </div>
-      </div>
-
-      {/* パスワード入力モーダル */}
+      {/* パスワードモーダル */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl">
-            <h2 className="text-xl font-bold mb-4 flex items-center">
-              <span className="text-2xl mr-2">🔒</span>
-              パスワードにゅうりょく
-            </h2>
-            
-            <div className="mb-4">
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handlePasswordCheck()}
-                className={`w-full p-3 border rounded-lg text-center text-2xl ${passwordError ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="＊＊＊＊"
-                autoFocus
-              />
-              {passwordError && (
-                <p className="text-red-500 text-center mt-2">パスワードがちがいます</p>
-              )}
-            </div>
-            
-            <div className="flex justify-between gap-3">
-              <button
-                onClick={() => {
-                  setShowPasswordModal(false);
-                  setPassword('');
-                  setPasswordError(false);
-                }}
-                className="flex-1 bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handlePasswordCheck}
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-              >
-                かくにん
-              </button>
-            </div>
-          </div>
-        </div>
+        <PasswordModal 
+          password={password}
+          setPassword={setPassword}
+          passwordError={passwordError}
+          onCheck={handlePasswordCheck}
+          onCancel={() => {
+            setShowPasswordModal(false);
+            setPassword('');
+            setPasswordError(false);
+          }}
+        />
       )}
     </div>
   );

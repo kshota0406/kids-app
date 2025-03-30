@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap");
 @import "tailwindcss";
 
 @theme {
@@ -17,6 +18,9 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   --shadow-md: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   --shadow-lg: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
 }
 
 /* カスタム高さクラス */
@@ -32,11 +36,16 @@
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
   background-image: linear-gradient(to bottom, #f0f7ff, #e8f5ff);
   background-attachment: fixed;
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: 'Kosugi Maru', sans-serif;
 }
 
 /* 背景に楽しい模様を追加 */
@@ -139,4 +148,192 @@ button:active, a.button:active {
   transform: scale(0, 0);
   opacity: .3;
   transition: 0s;
+}
+
+/* 既存のスタイルに続けて追加 */
+* {
+  font-family: "Kosugi Maru", sans-serif;
+}
+
+/* 点滅アニメーション */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.blink {
+  animation: blink 2s ease-in-out infinite;
+}
+
+/* ふわふわ浮遊アニメーション */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+  display: inline-block;
+}
+
+/* バウンスアニメーション */
+@keyframes bounce-custom {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-10px); }
+  60% { transform: translateY(-5px); }
+}
+
+.bounce-custom {
+  animation: bounce-custom 0.8s ease infinite;
+  display: inline-block;
+}
+
+/* 振動アニメーション */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-2px) rotate(-2deg); }
+  40% { transform: translateX(2px) rotate(2deg); }
+  60% { transform: translateX(-2px) rotate(-1deg); }
+  80% { transform: translateX(2px) rotate(1deg); }
+}
+
+.hover-shake:hover {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* パルスアニメーション */
+@keyframes pulse-custom {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.pulse-custom {
+  animation: pulse-custom 1.5s ease-in-out infinite;
+}
+
+/* 虹色テキスト */
+.rainbow-text {
+  background-image: linear-gradient(45deg, #ff6b6b, #ff922b, #fcc419, #51cf66, #339af0, #5f3dc4, #cc5de8);
+  background-size: 300% 300%;
+  animation: rainbow-bg 8s linear infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+@keyframes rainbow-bg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* キラキラエフェクト */
+.sparkle {
+  position: relative;
+  overflow: hidden;
+}
+
+.sparkle::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.8) 50%, rgba(255,255,255,0) 100%);
+  transform: rotate(30deg);
+  animation: sparkle-effect 4s ease-in-out infinite;
+}
+
+@keyframes sparkle-effect {
+  0% { transform: rotate(30deg) translateX(-100%); }
+  100% { transform: rotate(30deg) translateX(100%); }
+}
+
+/* 子供向けフレーム */
+.kid-frame {
+  border-image-slice: 10;
+  border-width: 5px;
+  border-style: solid;
+  border-image-repeat: stretch;
+  border-radius: 8px;
+}
+
+/* ドット背景 */
+.dotted-bg {
+  background-image: radial-gradient(rgba(128, 90, 213, 0.1) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+
+/* お手伝いカードのホバーエフェクト */
+.chore-card {
+  transition: all 0.3s ease-in-out;
+}
+
+.chore-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* 完了アニメーション */
+.complete-animation {
+  animation: complete 1s ease-in-out;
+}
+
+@keyframes complete {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* カスタムスクロールバー */
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background-color: rgba(128, 90, 213, 0.1);
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: rgba(128, 90, 213, 0.3);
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(128, 90, 213, 0.5);
+}
+
+/* 紙吹雪スタイル */
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: var(--color);
+  border-radius: 2px;
+  animation: fall 4s linear forwards;
+  opacity: 0.8;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
 }

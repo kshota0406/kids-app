@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 子供のお手伝いポイント管理アプリ
 
-## Getting Started
+子供の家事や日常的なお手伝いを楽しく管理するためのWebアプリケーションです。子供たちがお手伝いをするたびにポイントがたまり、達成感を味わいながら家庭での役割を学ぶことができます。
 
-First, run the development server:
+## 特徴
+
+- 複数の子供を登録して個別に管理
+- カラフルで直感的なUI（子供向けのアイコンとカラーテーマ）
+- お手伝いをしたらタップするだけの簡単操作
+- お手伝い完了時にはお祝いの紙吹雪エフェクト
+- 子供ごとのポイント履歴管理
+- カスタムお手伝いメニューの作成と管理
+- データのバックアップ・復元機能
+
+## 技術スタック
+
+- **フレームワーク**: [Next.js](https://nextjs.org/) (v15)
+- **言語**: [TypeScript](https://www.typescriptlang.org/) (v5)
+- **UIライブラリ**: [React](https://reactjs.org/) (v19)
+- **スタイリング**: [Tailwind CSS](https://tailwindcss.com/) (v4)
+- **データ管理**: ローカルストレージ（ブラウザ内保存）
+- **アニメーション**: [canvas-confetti](https://github.com/catdad/canvas-confetti)
+- **ユニークID生成**: [UUID](https://github.com/uuidjs/uuid)
+
+## 主な機能
+
+### ホーム画面
+- お手伝いメニュー一覧
+- 子供選択機能
+- ポイント表示と集計
+- お手伝い履歴一覧
+
+### 設定画面
+- 子供の管理（編集）
+- お手伝いメニューの管理（追加・削除）
+- 保護者向け設定（パスワード保護機能）
+- データのバックアップ・復元
+
+## データ保存について
+
+このアプリはローカルストレージを利用してデータを保存します。つまり：
+
+- **データはブラウザ内に保存**されます
+- 別のデバイスやブラウザでは共有されません
+- ブラウザの履歴やキャッシュを消去するとデータが失われる可能性があります
+- インターネット接続なしでも使用可能です
+
+### バックアップと復元
+- 設定画面からデータをJSONファイルとしてエクスポート可能
+- バックアップファイルを使ってデータを復元可能
+- 機種変更やブラウザ移行時のデータ引き継ぎに便利
+
+## 使い方
+
+1. ホーム画面でお手伝いカードをタップ
+2. 子供を選択
+3. お祝いの紙吹雪と共にポイントが加算
+4. 「ポイントをかくにん」ボタンで現在のポイントを確認
+5. 「ポイントをゲット」ボタンで貯まったポイントを集計
+
+## 保護者向け機能
+
+設定ページは保護者向けに設計されています：
+
+- パスワード: `1234`
+- お手伝いの追加・削除
+- 子供情報の編集
+- データのバックアップと復元
+
+## 注意事項
+
+- 画面サイズによってUIが最適化されます（レスポンシブデザイン）
+- データのバックアップを定期的に行うことをお勧めします
+
+## 開発者向け情報
+
+### 開発環境の準備
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# パッケージのインストール
+pnpm install
+
+# 開発サーバーの起動
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで [http://localhost:3000](http://localhost:3000) を開いてアプリを確認できます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### ビルドと実行
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# プロダクションビルド
+pnpm build
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# ビルドしたアプリの実行
+pnpm start
+```
